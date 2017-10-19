@@ -45,4 +45,29 @@ defmodule JsonStreamEncoder.Test do
     :file.close(ram_file)
   end
 
+  test "encode an array in an object" do
+    {:ok, ram_file} = :file.open("", [:read, :write, :binary, :ram])
+    state = JsonStreamEncoder.State.new(ram_file)
+    obj(state, fn(st) ->
+      st |> key("my_key") |> ary(fn(ar) -> ar end)
+    end)
+    {:ok, pos} = :file.position(ram_file, :cur)
+    {:ok, start} = :file.position(ram_file, :bof)
+    {:ok, written_data} = :file.read(ram_file, pos)
+    IO.puts(written_data)
+    :file.close(ram_file)
+  end
+
+  test "encode an object in an object" do
+    {:ok, ram_file} = :file.open("", [:read, :write, :binary, :ram])
+    state = JsonStreamEncoder.State.new(ram_file)
+    obj(state, fn(st) ->
+      st |> key("my_key") |> obj(fn(ar) -> ar end)
+    end)
+    {:ok, pos} = :file.position(ram_file, :cur)
+    {:ok, start} = :file.position(ram_file, :bof)
+    {:ok, written_data} = :file.read(ram_file, pos)
+    IO.puts(written_data)
+    :file.close(ram_file)
+  end
 end
