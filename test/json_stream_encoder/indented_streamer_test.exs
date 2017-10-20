@@ -2,7 +2,7 @@ defmodule JsonStreamEncoder.IndentedStreamerTest do
   use ExUnit.Case
   doctest JsonStreamEncoder.IndentedStreamer
 
-  import JsonStreamEncoder.IndentedStreamer
+  import JsonStreamEncoder
 
   defp write_json(work_fn) do
     {:ok, ram_file} = :file.open("", [:read, :write, :binary, :ram])

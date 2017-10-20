@@ -1,37 +1,27 @@
 defmodule JsonStreamEncoder.CompactStreamer do
-  defstruct [:io, state: nil, stack: [], depth: 0]
+  defstruct [:io, state: nil, stack: []]
 
   use Poison.Encode
+
+  @behaviour JsonStreamEncoder.Streamer
 
   def new(io_stream) do
     %__MODULE__{io: io_stream}
   end
 
-  def ary(state, ary_fun) do
-    ary_fun.(state |> ary_start) |> ary_end
-  end
-
-  def obj(state, obj_fun) do
-    obj_fun.(state |> obj_start) |> obj_end
-  end
-
-  def kv(state, k, v) do
-    state |> key(k) |> val(v)
-  end
-
   def ary_start(%__MODULE__{io: io_stream, state: nil} = state) do
     IO.binwrite(io_stream, "[")
-    %__MODULE__{state | state: {:in_ary, true}, stack: [], depth: 1}
+    %__MODULE__{state | state: {:in_ary, true}, stack: []}
   end
 
-  def ary_start(%__MODULE__{io: io_stream, state: s, stack: stack, depth: d} = state) do
+  def ary_start(%__MODULE__{io: io_stream, state: s, stack: stack} = state) do
     IO.binwrite(io_stream, "[")
-    %__MODULE__{state | state: {:in_ary, true}, stack: [s|stack], depth: d + 1}
+    %__MODULE__{state | state: {:in_ary, true}, stack: [s|stack]}
   end
 
   def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: []} = state) do
     IO.binwrite(io_stream, "]")
-    %__MODULE__{state | state: nil, stack: [], depth: 0}
+    %__MODULE__{state | state: nil, stack: []}
   end
 
   def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [:await_val,new_state|rest]} = state) do
@@ -74,7 +64,7 @@ defmodule JsonStreamEncoder.CompactStreamer do
     %__MODULE__{state | state: new_state, stack: rest}
   end
 
-  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, _}, stack: [new_state|rest], depth: d} = state) do
+  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, _}, stack: [new_state|rest]} = state) do
     IO.binwrite(io_stream, "}")
     %__MODULE__{state | state: new_state, stack: rest}
   end

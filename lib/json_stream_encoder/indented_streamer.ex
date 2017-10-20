@@ -3,22 +3,12 @@ defmodule JsonStreamEncoder.IndentedStreamer do
 
   use Poison.Encode
 
+  @behaviour JsonStreamEncoder.Streamer
+
   @default_indent "  "
 
   def new(io_stream, indent_val \\ @default_indent) do
     %__MODULE__{io: io_stream, indent_string: indent_val}
-  end
-
-  def ary(state, ary_fun) do
-    ary_fun.(state |> ary_start) |> ary_end
-  end
-
-  def obj(state, obj_fun) do
-    obj_fun.(state |> obj_start) |> obj_end
-  end
-
-  def kv(state, k, v) do
-    state |> key(k) |> val(v)
   end
 
   def ary_start(%__MODULE__{io: io_stream, state: nil} = state) do

@@ -2,7 +2,7 @@ defmodule JsonStreamEncoder.CompactStreamerTest do
   use ExUnit.Case
   doctest JsonStreamEncoder.CompactStreamer
 
-  import JsonStreamEncoder.CompactStreamer
+  import JsonStreamEncoder
 
   defp write_json(work_fn) do
     {:ok, ram_file} = :file.open("", [:read, :write, :binary, :ram])
