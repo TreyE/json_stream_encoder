@@ -8,19 +8,27 @@ defmodule JsonStreamEncoder.Mixfile do
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
+      description: "A simple interface for streaming JSON to IO.",
       dialyzer: [
         plt_add_deps: :apps_direct,
-        ignore_warnings: "dialyzer.ignore-warnings",
         plt_add_apps: [
           :compiler, :elixir, :kernel, :logger, :stdlib,
-          ]]
+        ]
+      ],
+      package: package()
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
+    []
+  end
+
+  defp package() do
     [
-      extra_applications: [:logger]
+      licenses: ["MIT"],
+      maintainers: ["Trey Evans"],
+      source_url: "https://github.com/TreyE/json_stream_encoder"
     ]
   end
 
