@@ -1,4 +1,4 @@
-defmodule JsonStreamEncoder.State do
+defmodule JsonStreamEncoder.IndentedStreamer do
   defstruct [:io, state: nil, stack: [], depth: 0]
 
   use Poison.Encode
@@ -31,32 +31,32 @@ defmodule JsonStreamEncoder.State do
 
   def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, true}, stack: []} = state) do
     IO.binwrite(io_stream, "]")
-    %__MODULE__{state | state: nil, stack: []}
+    %__MODULE__{state | state: nil, stack: [], depth: 0}
   end
 
   def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: []} = state) do
     IO.binwrite(io_stream, "\n]")
-    %__MODULE__{state | state: nil, stack: []}
+    %__MODULE__{state | state: nil, stack: [], depth: 0}
   end
 
-  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, true}, stack: [:await_val,new_state|rest]} = state) do
+  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, true}, stack: [:await_val,new_state|rest],depth: d} = state) do
     IO.binwrite(io_stream, "]")
-    %__MODULE__{state | state: new_state, stack: rest}
+    %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
-  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, true}, stack: [new_state|rest]} = state) do
+  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, true}, stack: [new_state|rest], depth: d} = state) do
     IO.binwrite(io_stream, "]")
-    %__MODULE__{state | state: new_state, stack: rest}
+    %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
-  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [:await_val,new_state|rest]} = state) do
-    IO.binwrite(io_stream, "\n]")
-    %__MODULE__{state | state: new_state, stack: rest}
+  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [:await_val,new_state|rest], depth: d} = state) do
+    IO.binwrite(io_stream, ["\n", String.replicate("  ", d - 1), "]"])
+    %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
-  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [new_state|rest]} = state) do
-    IO.binwrite(io_stream, "\n]")
-    %__MODULE__{state | state: new_state, stack: rest}
+  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [new_state|rest]} = state, depth: d) do
+    IO.binwrite(io_stream, ["\n", String.replicate("  ", d - 1), "]"])
+    %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
   def obj_start(%__MODULE__{io: io_stream, state: nil} = state) do
@@ -81,22 +81,22 @@ defmodule JsonStreamEncoder.State do
 
   def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, true}, stack: []} = state) do
     IO.binwrite(io_stream, "}")
-    %__MODULE__{state | state: nil, stack: []}
+    %__MODULE__{state | state: nil, stack: [], depth: 0}
   end
 
   def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, _}, stack: []} = state) do
     IO.binwrite(io_stream, "\n}")
-    %__MODULE__{state | state: nil, stack: []}
+    %__MODULE__{state | state: nil, stack: [], depth: 0}
   end
 
-  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, true}, stack: [:await_val,new_state|rest]} = state) do
+  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, true}, stack: [:await_val,new_state|rest], depth: d} = state) do
     IO.binwrite(io_stream, "}")
-    %__MODULE__{state | state: new_state, stack: rest}
+    %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
-  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, true}, stack: [new_state|rest]} = state) do
+  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, true}, stack: [new_state|rest]} = state, depth: d) do
     IO.binwrite(io_stream, "}")
-    %__MODULE__{state | state: new_state, stack: rest}
+    %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
   def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, _}, stack: [:await_val,new_state|rest], depth: d} = state) do
