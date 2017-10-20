@@ -28,7 +28,8 @@ defmodule JsonStreamEncoder.Mixfile do
     [
       licenses: ["MIT"],
       maintainers: ["Trey Evans"],
-      source_url: "https://github.com/TreyE/json_stream_encoder"
+      source_url: "https://github.com/TreyE/json_stream_encoder",
+      links: %{"GitHub" => "https://github.com/TreyE/json_stream_encoder"}
     ]
   end
 
