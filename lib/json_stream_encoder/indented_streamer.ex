@@ -50,12 +50,12 @@ defmodule JsonStreamEncoder.IndentedStreamer do
   end
 
   def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [:await_val,new_state|rest], depth: d} = state) do
-    IO.binwrite(io_stream, ["\n", String.replicate("  ", d - 1), "]"])
+    IO.binwrite(io_stream, ["\n", String.duplicate("  ", d - 1), "]"])
     %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
   def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [new_state|rest]} = state, depth: d) do
-    IO.binwrite(io_stream, ["\n", String.replicate("  ", d - 1), "]"])
+    IO.binwrite(io_stream, ["\n", String.duplicate("  ", d - 1), "]"])
     %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
@@ -94,7 +94,7 @@ defmodule JsonStreamEncoder.IndentedStreamer do
     %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
-  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, true}, stack: [new_state|rest]} = state, depth: d) do
+  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, true}, stack: [new_state|rest], depth: d} = state) do
     IO.binwrite(io_stream, "}")
     %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
@@ -103,6 +103,7 @@ defmodule JsonStreamEncoder.IndentedStreamer do
     IO.binwrite(io_stream, ["\n", String.duplicate("  ", d - 1), "}"])
     %__MODULE__{state | state: new_state, stack: rest, depth: (d - 1)}
   end
+
 
   def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, _}, stack: [new_state|rest], depth: d} = state) do
     IO.binwrite(io_stream, ["\n", String.duplicate("  ", d - 1), "}"])
@@ -119,7 +120,7 @@ defmodule JsonStreamEncoder.IndentedStreamer do
     %__MODULE__{state | state: :await_val, stack: [{:in_obj, false}|stack]}
   end
 
-  def val(%__MODULE__{io: io_stream, state: :await_val, stack: [past_state|rest], depth: d} = state, v) do
+  def val(%__MODULE__{io: io_stream, state: :await_val, stack: [past_state|rest]} = state, v) do
     IO.binwrite(io_stream, [Poison.encode!(v)])
     %__MODULE__{state | state: past_state, stack: rest}
   end
