@@ -1,10 +1,12 @@
 defmodule JsonStreamEncoder.IndentedStreamer do
-  defstruct [:io, state: nil, stack: [], depth: 0]
+  defstruct [:io, state: nil, stack: [], depth: 0, indent_string: nil] 
 
   use Poison.Encode
 
-  def new(io_stream) do
-    %__MODULE__{io: io_stream}
+  @default_indent "  "
+
+  def new(io_stream, indent_val \\ @default_indent) do
+    %__MODULE__{io: io_stream, indent_string: indent_val}
   end
 
   def ary(state, ary_fun) do
@@ -49,13 +51,13 @@ defmodule JsonStreamEncoder.IndentedStreamer do
     %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
-  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [:await_val,new_state|rest], depth: d} = state) do
-    IO.binwrite(io_stream, ["\n", String.duplicate("  ", d - 1), "]"])
+  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [:await_val,new_state|rest], depth: d, indent_string: id_str} = state) do
+    IO.binwrite(io_stream, ["\n", String.duplicate(id_str, d - 1), "]"])
     %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
-  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [new_state|rest]} = state, depth: d) do
-    IO.binwrite(io_stream, ["\n", String.duplicate("  ", d - 1), "]"])
+  def ary_end(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: [new_state|rest], indent_string: id_str} = state, depth: d) do
+    IO.binwrite(io_stream, ["\n", String.duplicate(id_str, d - 1), "]"])
     %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
@@ -64,13 +66,13 @@ defmodule JsonStreamEncoder.IndentedStreamer do
     %__MODULE__{state | state: {:in_obj, true}, stack: [], depth: 1}
   end
 
-  def obj_start(%__MODULE__{io: io_stream, state: {:in_ary, true}, stack: stack, depth: d} = state) do
-    IO.binwrite(io_stream, ["\n", String.duplicate("  ", d), "{"])
+  def obj_start(%__MODULE__{io: io_stream, state: {:in_ary, true}, stack: stack, depth: d, indent_string: id_str} = state) do
+    IO.binwrite(io_stream, ["\n", String.duplicate(id_str, d), "{"])
     %__MODULE__{state | state: {:in_obj, true}, stack: [{:in_ary, false}|stack], depth: d + 1}
   end
 
-  def obj_start(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: stack, depth: d} = state) do
-    IO.binwrite(io_stream, [",\n", String.duplicate("  ", d + 1), "{"])
+  def obj_start(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: stack, depth: d, indent_string: id_str} = state) do
+    IO.binwrite(io_stream, [",\n", String.duplicate(id_str, d + 1), "{"])
     %__MODULE__{state | state: {:in_obj, true}, stack: [{:in_ary, false}|stack], depth: d + 1}
   end
 
@@ -99,24 +101,24 @@ defmodule JsonStreamEncoder.IndentedStreamer do
     %__MODULE__{state | state: new_state, stack: rest, depth: d - 1}
   end
 
-  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, _}, stack: [:await_val,new_state|rest], depth: d} = state) do
-    IO.binwrite(io_stream, ["\n", String.duplicate("  ", d - 1), "}"])
+  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, _}, stack: [:await_val,new_state|rest], depth: d, indent_string: id_str} = state) do
+    IO.binwrite(io_stream, ["\n", String.duplicate(id_str, d - 1), "}"])
     %__MODULE__{state | state: new_state, stack: rest, depth: (d - 1)}
   end
 
 
-  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, _}, stack: [new_state|rest], depth: d} = state) do
-    IO.binwrite(io_stream, ["\n", String.duplicate("  ", d - 1), "}"])
+  def obj_end(%__MODULE__{io: io_stream, state: {:in_obj, _}, stack: [new_state|rest], depth: d, indent_string: id_str} = state) do
+    IO.binwrite(io_stream, ["\n", String.duplicate(id_str, d - 1), "}"])
     %__MODULE__{state | state: new_state, stack: rest, depth: (d - 1)}
   end
 
-  def key(%__MODULE__{io: io_stream, state: {:in_obj, true}, stack: stack, depth: d} = state, k) do
-    IO.binwrite(io_stream, ["\n", String.duplicate("  ", d), "\"", encode_name(k), "\": "])
+  def key(%__MODULE__{io: io_stream, state: {:in_obj, true}, stack: stack, depth: d, indent_string: id_str} = state, k) do
+    IO.binwrite(io_stream, ["\n", String.duplicate(id_str, d), "\"", encode_name(k), "\": "])
     %__MODULE__{state | state: :await_val, stack: [{:in_obj, false}|stack]}
   end
 
-  def key(%__MODULE__{io: io_stream, state: {:in_obj, false}, stack: stack, depth: d} = state, k) do
-    IO.binwrite(io_stream, [",\n", String.duplicate("  ", d), "\"", encode_name(k), "\": "])
+  def key(%__MODULE__{io: io_stream, state: {:in_obj, false}, stack: stack, depth: d, indent_string: id_str} = state, k) do
+    IO.binwrite(io_stream, [",\n", String.duplicate(id_str, d), "\"", encode_name(k), "\": "])
     %__MODULE__{state | state: :await_val, stack: [{:in_obj, false}|stack]}
   end
 
@@ -125,13 +127,13 @@ defmodule JsonStreamEncoder.IndentedStreamer do
     %__MODULE__{state | state: past_state, stack: rest}
   end
 
-  def val(%__MODULE__{io: io_stream, state: {:in_ary, false}, stack: stack, depth: d} = state, v) do
-    IO.binwrite(io_stream, [",\n", String.duplicate("  ", d), Poison.encode!(v)])
+  def val(%__MODULE__{io: io_stream, state: {:in_ary, false}, stack: stack, depth: d, indent_string: id_str} = state, v) do
+    IO.binwrite(io_stream, [",\n", String.duplicate(id_str, d), Poison.encode!(v)])
     %__MODULE__{state | state: {:in_ary, false}, stack: stack}
   end
 
-  def val(%__MODULE__{io: io_stream, state: {:in_ary, true}, stack: stack, depth: d} = state, v) do
-    IO.binwrite(io_stream, ["\n", String.duplicate("  ", d), Poison.encode!(v)])
+  def val(%__MODULE__{io: io_stream, state: {:in_ary, true}, stack: stack, depth: d, indent_string: id_str} = state, v) do
+    IO.binwrite(io_stream, ["\n", String.duplicate(id_str, d), Poison.encode!(v)])
     %__MODULE__{state | state: {:in_ary, false}, stack: stack}
   end
 
