@@ -130,7 +130,7 @@ defmodule JsonStreamEncoder.IndentedStreamer do
   end
 
   def val(%__MODULE__{io: io_stream, state: nil} = state, v) do
-    IO.binwrite(io_stream, Poison.encode(v))
+    IO.binwrite(io_stream, Poison.encode!(v))
     state
   end
 end
