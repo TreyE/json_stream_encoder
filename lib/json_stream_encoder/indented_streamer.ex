@@ -1,4 +1,6 @@
 defmodule JsonStreamEncoder.IndentedStreamer do
+  @moduledoc false
+
   defstruct [:io, state: nil, stack: [], depth: 0, indent_string: nil] 
 
   use Poison.Encode

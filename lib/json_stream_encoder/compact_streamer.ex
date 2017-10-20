@@ -1,4 +1,6 @@
 defmodule JsonStreamEncoder.CompactStreamer do
+  @moduledoc false
+
   defstruct [:io, state: nil, stack: []]
 
   use Poison.Encode
