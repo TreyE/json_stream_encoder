@@ -7,6 +7,7 @@ defmodule JsonStreamEncoder do
   @opaque streamer :: %JsonStreamEncoder.CompactStreamer{} | %JsonStreamEncoder.IndentedStreamer{}
   @type key :: atom | binary | number | nonempty_charlist | boolean
   @type indentation :: boolean | binary
+  @type encodeable :: Poison.Encoder.t
 
   @spec new(io_stream) :: streamer
   @doc """
@@ -133,7 +134,7 @@ Always follow this with a `val/2`, `obj/2`, or `ary/2` - otherwise your JSON won
     - After a key
     - As an array element
   """
-  @spec val(streamer, any) :: streamer
+  @spec val(streamer, encodeable) :: streamer
   def val(streamer, v) do
     streamer.__struct__.val(streamer, v)
   end
@@ -143,7 +144,7 @@ Always follow this with a `val/2`, `obj/2`, or `ary/2` - otherwise your JSON won
 
     You should really only use this if your value is simple, otherwise use `key/2` in comnbination with other functions.
   """
-  @spec kv(streamer, key, any) :: streamer
+  @spec kv(streamer, key, encodeable) :: streamer
   def kv(streamer, k, v) do
     streamer |> key(k) |> val(v)
   end
