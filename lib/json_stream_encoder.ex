@@ -142,7 +142,7 @@ Always follow this with a `val/2`, `obj/2`, or `ary/2` - otherwise your JSON won
   @doc """
     Encode a key-value pair for an object.
 
-    You should really only use this if your value is simple, otherwise use `key/2` in comnbination with other functions.
+    You should really only use this if your value is simple, otherwise use `key/2` in combination with other functions.
   """
   @spec kv(streamer, key, encodeable) :: streamer
   def kv(streamer, k, v) do
