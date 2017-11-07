@@ -11,8 +11,7 @@ If you don't need a streaming interface and want more protocol support, use Pois
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `json_stream_encoder` to your list of dependencies in `mix.exs`:
+Using [Hex](https://hex.pm), the package can be installed by adding `json_stream_encoder` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -22,7 +21,5 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/json_stream_encoder](https://hexdocs.pm/json_stream_encoder).
+The docs for the most recent version can be found at [https://hexdocs.pm/json_stream_encoder](https://hexdocs.pm/json_stream_encoder).
 
