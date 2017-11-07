@@ -21,5 +21,5 @@ def deps do
 end
 ```
 
-The docs for the most recent version can be found at [https://hexdocs.pm/json_stream_encoder](https://hexdocs.pm/json_stream_encoder).
+The docs for the most recent version can be found at [Hex Docs](https://hexdocs.pm/json_stream_encoder).
 
