@@ -64,7 +64,7 @@ defmodule JsonStreamEncoder.IndentedStreamer do
   end
 
   def obj_start(%__MODULE__{io: io_stream, state: {:in_ary, _}, stack: stack, depth: d, indent_string: id_str} = state) do
-    IO.binwrite(io_stream, [",\n", String.duplicate(id_str, d + 1), "{"])
+    IO.binwrite(io_stream, [",\n", String.duplicate(id_str, d), "{"])
     %__MODULE__{state | state: {:in_obj, true}, stack: [{:in_ary, false}|stack], depth: d + 1}
   end
 

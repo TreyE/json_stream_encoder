@@ -16,7 +16,7 @@ Using [Hex](https://hex.pm), the package can be installed by adding `json_stream
 ```elixir
 def deps do
   [
-    {:json_stream_encoder, "~> 0.1.0"}
+    {:json_stream_encoder, "~> 0.1.2"}
   ]
 end
 ```

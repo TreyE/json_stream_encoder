@@ -77,4 +77,18 @@ defmodule JsonStreamEncoder.IndentedStreamerTest do
     end)
     assert("{\n  \"my_key\": {\n    \"5\": []\n  }\n}" = written_data)
   end
+
+  test "encode an a set of objects in an array" do
+    written_data = write_json(fn(ram_file) ->
+      state = JsonStreamEncoder.IndentedStreamer.new(ram_file)
+      ary(state, fn(st) ->
+        st |> obj(fn(o) -> 
+         o |> key("key1") |> obj(fn(o2) -> kv(o2, "inside_key", "val") end)
+        end) |> obj(fn(o) ->
+          o |> kv("key2", 2)
+        end)
+      end)
+    end)
+    assert("[\n  {\n    \"key1\": {\n      \"inside_key\": \"val\"\n    }\n  },\n  {\n    \"key2\": 2\n  }\n]" = written_data)
+  end
 end
