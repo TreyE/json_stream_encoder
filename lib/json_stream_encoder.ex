@@ -7,7 +7,7 @@ defmodule JsonStreamEncoder do
   @opaque streamer :: %JsonStreamEncoder.CompactStreamer{} | %JsonStreamEncoder.IndentedStreamer{}
   @type key :: atom | binary | number | nonempty_charlist | boolean
   @type indentation :: boolean | binary
-  @type encodeable :: Poison.Encoder.t
+  @type encodeable :: Jason.Encoder.t
 
   @spec new(io_stream) :: streamer
   @doc """
@@ -128,7 +128,7 @@ Always follow this with a `val/2`, `obj/2`, or `ary/2` - otherwise your JSON won
 
   @doc """
     Encode a value.
-    
+
     Usable anywhere you would expect a JSON value:
     - The root of a document
     - After a key
