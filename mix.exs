@@ -1,13 +1,13 @@
 defmodule JsonStreamEncoder.Mixfile do
   use Mix.Project
 
-  @version "0.1.2"
+  @version "0.2.0"
 
   def project do
     [
       app: :json_stream_encoder,
       version: @version,
-      elixir: "~> 1.5",
+      elixir: "~> 1.7",
       start_permanent: Mix.env == :prod,
       deps: deps(),
       description: "A simple interface for streaming JSON to IO.",
@@ -39,7 +39,7 @@ defmodule JsonStreamEncoder.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:poison, "~> 3.1"},
+      {:jason, ">= 1.0.0"},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false}
     ]

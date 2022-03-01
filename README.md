@@ -5,9 +5,9 @@ JsonStreamEncoder is a streaming encoder for streaming JSON to an IOish thing in
 Its use case is for when you care more about constant memory consumption and
 parallelism than you do about raw speed.
 
-It is based on and uses [Poison](https://github.com/devinus/poison).
+It is based on and uses [Jason](https://github.com/michalmuskala/jason).
 
-If you don't need a streaming interface and want more protocol support, use Poison. 
+If you don't need a streaming interface and want more protocol support, use Jason. 
 
 ## Installation
 
@@ -16,7 +16,7 @@ Using [Hex](https://hex.pm), the package can be installed by adding `json_stream
 ```elixir
 def deps do
   [
-    {:json_stream_encoder, "~> 0.1.2"}
+    {:json_stream_encoder, "~> 0.2.0"}
   ]
 end
 ```
