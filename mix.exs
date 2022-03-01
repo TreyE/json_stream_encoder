@@ -40,7 +40,7 @@ defmodule JsonStreamEncoder.Mixfile do
   defp deps do
     [
       {:jason, ">= 1.0.0"},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false}
     ]
   end
